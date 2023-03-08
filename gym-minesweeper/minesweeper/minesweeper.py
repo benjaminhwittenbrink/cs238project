@@ -7,8 +7,8 @@ import gym
 from gym import spaces
 
 # default : easy board
-BOARD_SIZE = 10
-NUM_MINES = 9
+BOARD_SIZE = 3
+NUM_MINES = 3
 
 # cell values, non-negatives indicate number of neighboring mines
 MINE = -1
@@ -199,9 +199,9 @@ class MinesweeperEnv(gym.Env):
         y = int(round(action[1]))
 
         # test valid action
-        if bool(self.valid_actions[x, y]) is False:
-            raise Exception("Invalid action was selected! Action Filter: {}, "
-                            "action taken: {}".format(self.valid_actions, action))
+        # if bool(self.valid_actions[x, y]) is False:
+        #     raise Exception("Invalid action was selected! Action Filter: {}, "
+        #                     "action taken: {}".format(self.valid_actions, action))
 
         next_state, reward, done, info = self.next_step(state, x, y)
         self.my_board = next_state
