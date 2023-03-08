@@ -89,10 +89,10 @@ class MinesweeperEnv(gym.Env):
         self.num_mines = num_mines
         self.board = place_mines(board_size, num_mines)
         self.my_board = np.ones((board_size, board_size), dtype=int) * CLOSED
-        self.valid_actions = np.ones((self.board_size, self.board_size), dtype=np.bool)
+        self.valid_actions = np.ones((self.board_size, self.board_size), dtype=bool)
 
         self.observation_space = spaces.Box(low=-2, high=9,
-                                            shape=(self.board_size, self.board_size), dtype=np.int)
+                                            shape=(self.board_size, self.board_size), dtype=int)
         self.action_space = spaces.MultiDiscrete([self.board_size, self.board_size])
 
     def count_neighbour_mines(self, x, y):
@@ -176,7 +176,7 @@ class MinesweeperEnv(gym.Env):
         """
         self.board = place_mines(self.board_size, self.num_mines)
         self.my_board = np.ones((self.board_size, self.board_size), dtype=int) * CLOSED
-        self.valid_actions = np.ones((self.board_size, self.board_size), dtype=np.bool)
+        self.valid_actions = np.ones((self.board_size, self.board_size), dtype=bool)
         return self.my_board
 
     def step(self, action):
@@ -271,9 +271,9 @@ class MinesweeperDiscreetEnv(gym.Env):
         self.num_actions = 0
 
         self.observation_space = spaces.Box(low=-2, high=9,
-                                            shape=(self.board_size, self.board_size), dtype=np.int)
+                                            shape=(self.board_size, self.board_size), dtype=int)
         self.action_space = spaces.Discrete(self.board_size*self.board_size)
-        self.valid_actions = np.ones((self.board_size * self.board_size), dtype=np.bool)
+        self.valid_actions = np.ones((self.board_size * self.board_size), dtype=bool)
 
     def count_neighbour_mines(self, x, y):
         """return number of mines in neighbour cells given an x-y coordinate
