@@ -7,8 +7,8 @@ import gym
 from gym import spaces
 
 # default : easy board
-BOARD_SIZE = 3
-NUM_MINES = 3
+BOARD_SIZE = 4
+NUM_MINES = 4
 
 # cell values, non-negatives indicate number of neighboring mines
 MINE = -1
@@ -91,7 +91,8 @@ class MinesweeperEnv(gym.Env):
         self.my_board = np.ones((board_size, board_size), dtype=int) * CLOSED
         self.valid_actions = np.ones((self.board_size, self.board_size), dtype=bool)
 
-        self.observation_space = spaces.Box(low=-2, high=9,
+        self.observation_space = spaces.Box(low=-2, high=np.minimum(NUM_MINES, 9),
+        #self.observation_space = spaces.Box(low=-2, high=NUM_MINES,
                                             shape=(self.board_size, self.board_size), dtype=int)
         self.action_space = spaces.MultiDiscrete([self.board_size, self.board_size])
 
