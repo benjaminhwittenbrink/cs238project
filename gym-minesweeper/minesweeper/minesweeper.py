@@ -7,8 +7,11 @@ import gym
 from gym import spaces
 
 # default : easy board
-BOARD_SIZE = 4
-NUM_MINES = 4
+BOARD_SIZE = 10
+NUM_MINES = 10
+CELLS = BOARD_SIZE * BOARD_SIZE
+
+POSSIBLE_VALUES = np.minimum(NUM_MINES, 8) + 3
 
 # cell values, non-negatives indicate number of neighboring mines
 MINE = -1
@@ -86,12 +89,14 @@ class MinesweeperEnv(gym.Env):
         """
 
         self.board_size = board_size
+        self.num_cells = self.board_size * self.board_size
+
         self.num_mines = num_mines
         self.board = place_mines(board_size, num_mines)
         self.my_board = np.ones((board_size, board_size), dtype=int) * CLOSED
         self.valid_actions = np.ones((self.board_size, self.board_size), dtype=bool)
 
-        self.observation_space = spaces.Box(low=-2, high=np.minimum(NUM_MINES, 9),
+        self.observation_space = spaces.Box(low=-2, high=np.minimum(NUM_MINES, 8),
         #self.observation_space = spaces.Box(low=-2, high=NUM_MINES,
                                             shape=(self.board_size, self.board_size), dtype=int)
         self.action_space = spaces.MultiDiscrete([self.board_size, self.board_size])
@@ -419,11 +424,11 @@ class MinesweeperDiscreetEnv(gym.Env):
             state, game_over = self.get_next_state(my_board, x, y)
             if not game_over:
                 if is_win(state):
-                    return state, 1000, True, {}
+                    return state, 10, True, {}
                 else:
-                    return state, 0, False, {}
+                    return state, 1, False, {}
             else:
-                return state, -100, True, {}
+                return state, -10, True, {}
 
     def render(self, mode='human'):
         """
