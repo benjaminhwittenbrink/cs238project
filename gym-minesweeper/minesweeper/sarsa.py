@@ -34,34 +34,47 @@ for i in tqdm(range(NUM_ITERS)):
         print("Average win (last 10k):", np.mean(wins[-10_000:]))
         print("eps:", EPSILON)
 
-        pickle.dump(Q, open(f"q_learning_data/Q_{i}.pkl", "wb"))
-        np.save(f"q_learning_data/wins_{i}.npy", wins)
+        if i % 1_000_000 == 0: 
+            pickle.dump(Q, open(f"sarsa_55/Q_{i}.pkl", "wb"))
+        np.save(f"sarsa_55/wins_{i}.npy", wins)
         wins = []
+        verbose = True
 
+    state_str = ms.board2str(state)
+    if state_str not in Q: Q[state_str] = np.zeros((ms.BOARD_SIZE, ms.BOARD_SIZE))
+    
+    Q_valid_actions = np.copy(Q[state_str])
+    Q_valid_actions[state != -2] = - np.inf 
+
+    action_x, action_y = ExpHelpers.epsilon_greedy_exploration(env, actions, Q_valid_actions, EPSILON)
 
     done = False 
     while not done: 
-
-        state_str = ms.board2str(state)
-        if state_str not in Q: 
-            Q[state_str] = np.zeros((ms.BOARD_SIZE, ms.BOARD_SIZE))
-
-        action_x, action_y = ExpHelpers.epsilon_greedy_exploration(env, actions, Q[state_str], EPSILON)
-
         next_state, reward, done, info = env.step((action_x, action_y))
 
+        next_action_x, next_action_y = ExpHelpers.epsilon_greedy_exploration(env, actions, Q_valid_actions, EPSILON)
+
         curr_Q = Q[state_str][action_x, action_y]
-        update = reward + GAMMA * (np.max(Q[state_str]) - curr_Q)
+        update = reward + GAMMA * (Q[state_str][next_action_x, next_action_y] - curr_Q)
         Q[state_str][action_x, action_y] = curr_Q + ALPHA * update
 
         if done: 
             if reward > 0: wins.append(1)
             else: wins.append(0)
             state = env.reset()
+            if verbose: print("win:", reward > 0)
         else: 
             state = next_state
+            state_str = ms.board2str(state)
+            action_x = next_action_x
+            action_y = next_action_y
+            Q_valid_actions = np.copy(Q[state_str])
+            Q_valid_actions[state != -2] = - np.inf 
+
+        
     
-    if i > 1_00_000: 
+    verbose = False
+    if i > 500_000: 
         EPSILON = ExpHelpers.epsilon_decay_schedule(i - 500_000, MAX_EPS, MIN_EPS, EPS_DECAY)
 
 
