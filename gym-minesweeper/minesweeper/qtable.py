@@ -38,7 +38,6 @@ for i in tqdm(range(NUM_ITERS)):
             pickle.dump(Q, open(f"q_learning_data_55_p2/Q_{i}_p2.pkl", "wb"))
         np.save(f"q_learning_data_55_p2/wins_{i}_p2.npy", wins)
         wins = []
-        verbose = True
 
     done = False 
     while not done: 
@@ -51,21 +50,20 @@ for i in tqdm(range(NUM_ITERS)):
 
         action_x, action_y = ExpHelpers.epsilon_greedy_exploration(env, actions, Q_valid_actions, EPSILON)
         next_state, reward, done, info = env.step((action_x, action_y))
+        next_state_str = ms.board2str(next_state)
 
         curr_Q = Q[state_str][action_x, action_y]
-        update = reward + GAMMA * (np.max(Q[state_str]) - curr_Q)
+        update = reward + GAMMA * (np.max(Q[next_state_str]) - curr_Q)
         Q[state_str][action_x, action_y] = curr_Q + ALPHA * update
 
         if done: 
             if reward > 0: wins.append(1)
             else: wins.append(0)
             state = env.reset()
-            if verbose: print("win:", reward > 0)
         else: 
             state = next_state
         
     
-    verbose = False
     if i > 500_000: 
         EPSILON = ExpHelpers.epsilon_decay_schedule(i - 500_000, MAX_EPS, MIN_EPS, EPS_DECAY)
 
