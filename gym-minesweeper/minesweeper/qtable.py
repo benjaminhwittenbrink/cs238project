@@ -34,7 +34,7 @@ for i in tqdm(range(NUM_ITERS)):
         print("Average win (last 10k):", np.mean(wins[-10_000:]))
         print("eps:", EPSILON)
 
-        if i % 1_000_000: 
+        if i % 1_000_000 == 0: 
             pickle.dump(Q, open(f"q_learning_data_55_p2/Q_{i}_p2.pkl", "wb"))
         np.save(f"q_learning_data_55_p2/wins_{i}_p2.npy", wins)
         wins = []
@@ -50,10 +50,7 @@ for i in tqdm(range(NUM_ITERS)):
         Q_valid_actions[state != -2] = - np.inf 
 
         action_x, action_y = ExpHelpers.epsilon_greedy_exploration(env, actions, Q_valid_actions, EPSILON)
-        if verbose: print(action_x, action_y)
-
         next_state, reward, done, info = env.step((action_x, action_y))
-        if verbose: print(next_state)
 
         curr_Q = Q[state_str][action_x, action_y]
         update = reward + GAMMA * (np.max(Q[state_str]) - curr_Q)
