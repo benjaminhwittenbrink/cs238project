@@ -7,8 +7,8 @@ import gym
 from gym import spaces
 
 # default : easy board
-BOARD_SIZE = 10
-NUM_MINES = 10
+BOARD_SIZE = 5
+NUM_MINES = 5
 CELLS = BOARD_SIZE * BOARD_SIZE
 
 POSSIBLE_VALUES = np.minimum(NUM_MINES, 8) + 3
@@ -239,11 +239,11 @@ class MinesweeperEnv(gym.Env):
             state, game_over = self.get_next_state(my_board, x, y)
             if not game_over:
                 if is_win(state):
-                    return state, 1000, True, {}
+                    return state, 10, True, {}
                 else:
-                    return state, 5, False, {}
+                    return state, 1, False, {}
             else:
-                return state, -100, True, {}
+                return state, -10, True, {}
 
     def render(self, mode='human'):
         """
@@ -254,6 +254,10 @@ class MinesweeperEnv(gym.Env):
         outfile.write(s)
         if mode != 'human':
             return outfile
+        
+    def get_valid_actions(self, state):
+        return [(row, col) for col in range(self.board_size) for row in range(self.board_size) if self.valid_actions[row, col]]
+        
 
 
 class MinesweeperDiscreetEnv(gym.Env):
