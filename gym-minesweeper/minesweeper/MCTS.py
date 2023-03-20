@@ -13,6 +13,12 @@ class MCTS:
         self.Q = {}
         self.N = {}
         #self.N_widening = {}
+        
+    def run_mcts_search(self, state_str, num_simulations=10):
+        for _ in range(num_simulations):
+            self.simulate(state_str, self.search(state_str, self.env))
+
+        return self.get_best_action(state_str)
 
     def search(self, state, env):
         if state not in self.Q:  # if state doesn't exist 
