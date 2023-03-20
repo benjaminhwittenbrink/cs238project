@@ -24,19 +24,49 @@ env = ms.MinesweeperEnv()
 actions = env.action_space
 state = env.reset()
 
+def eval(env, Q, n = 10_000): 
+    wins = []
+    games_rand_action = []
+    for i in range(n): 
+        done = False
+        state = env.reset()
+        rand_action = 0
+        while not done: 
+            state_str = ms.board2str(state)
+
+            if state_str in Q: 
+                Q_valid_actions = np.copy(Q[state_str])
+                Q_valid_actions[state != -2] = - np.inf 
+                action = np.unravel_index(Q_valid_actions.argmax(), Q_valid_actions.shape)
+            else: 
+                rand_action += 1
+                actions = env.get_valid_actions(state_str)
+                action_ix = np.random.choice(np.arange(0, len(actions)))
+                action = actions[action_ix]
+
+            state, reward, done, _ = env.step(action)
+
+            if done: 
+                if reward > 0: 
+                    wins.append(1)
+                else: 
+                    wins.append(0)
+
+                games_rand_action.append(rand_action)
+    return np.array(wins), np.array(games_rand_action)
+
 for i in tqdm(range(NUM_ITERS)):
     
     if i % 100_000 == 0: 
+        wins_eval, rand_actions = eval(env, Q)
         print(i)
         print("State space size:", len(Q))
-        print("Game length:", len(wins))
-        print("Average win (last 100k):", np.mean(wins[-100_000:]))
-        print("Average win (last 10k):", np.mean(wins[-10_000:]))
+        print("Average win (last 10k):", np.mean(wins_eval))
         print("eps:", EPSILON)
 
         if i % 1_000_000 == 0: 
             pickle.dump(Q, open(f"q_learning_data_55_p2/Q_{i}_p2.pkl", "wb"))
-        np.save(f"q_learning_data_55_p2/wins_{i}_p2.npy", wins)
+        np.save(f"q_learning_data_55_p2/wins_{i}_p2.npy", wins_eval)
         wins = []
 
     done = False 
